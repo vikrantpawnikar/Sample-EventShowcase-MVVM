@@ -12,3 +12,6 @@ This repo has features like
 4. Koin for dependency injection.
 5. Retrofit with gson
 6. Room
+
+
+#***API key is private and should be in secret.property while using apis as API_KEY***

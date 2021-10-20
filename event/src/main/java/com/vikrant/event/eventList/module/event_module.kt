@@ -11,8 +11,7 @@ import org.koin.dsl.module
 var event_module= module {
 
     factory<EventListDataSource> { EventListRemoteDataSource(get()) }
-
-    // Tells Koin how to create an instance of CatRepository
+    
     factory<EventListRepository> { (EventListRepositoryImpl(dataSource = get(), get())) }
 
     single { GetEventListingUseCase(get()) }
