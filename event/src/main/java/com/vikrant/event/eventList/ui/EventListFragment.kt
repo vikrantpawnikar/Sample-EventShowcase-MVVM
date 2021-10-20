@@ -7,15 +7,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vikrant.core.model.EventDetail
 import com.vikrant.core.model.Events
 import com.vikrant.core.retrofitclient.ResultState
-import com.vikrant.event.R
 import com.vikrant.event.databinding.FragmentEventListBinding
 import com.vikrant.event.eventList.ui.adapter.EventListInteraction
 import com.vikrant.event.eventList.ui.adapter.EventRecyclerViewAdapter
-import com.vikrant.event.eventdetails.ui.EventDetailFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -33,8 +32,8 @@ class EventListFragment : Fragment(), EventListInteraction {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initEventRecyclerView()
         intiViewModel()
         lifecycleScope.launchWhenCreated { viewModel.getEventData() }
@@ -52,13 +51,13 @@ class EventListFragment : Fragment(), EventListInteraction {
         viewModel.uiLiveData.observe(viewLifecycleOwner, { populateUi(it) })
     }
 
-    private fun populateUi(it: ResultState<Events>?) {
-        when (it) {
+    private fun populateUi(result: ResultState<Events>?) {
+        when (result) {
             ResultState.Progress<Int>() -> {
                 binding.progressBar.visibility = View.VISIBLE
             }
             is ResultState.Success -> {
-                updateEventData(it)
+                updateEventData(result)
             }
             is ResultState.Failure -> {
                 Toast.makeText(requireActivity(), "Failure getting data", Toast.LENGTH_SHORT)
@@ -79,10 +78,8 @@ class EventListFragment : Fragment(), EventListInteraction {
 
     override fun onItemClicked(position: Int, item: EventDetail) {
         activity?.run {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_view, EventDetailFragment(item), null)
-                .addToBackStack(null)
-                .commit()
+            val direction = EventListFragmentDirections.navigateToEventDetailFragment(item)
+            findNavController().navigate(direction)
         }
     }
 }
